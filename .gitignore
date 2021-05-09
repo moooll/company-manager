@@ -1,3 +1,5 @@
 **./api-service
 **/air.toml
 **/vendor
+**/tmp
+docker-compose.yaml

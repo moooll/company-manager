@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/moooll/company-manager/api-service/pkg/domain"
-	"github.com/moooll/company-manager/repo-service/dao"
+	"github.com/moooll/company-manager/api-service/internal/messaging"
 )
 
 // Add a new employee to the company, sends employee object that needs to be added to the company
@@ -27,23 +27,51 @@ func addEmployee(c *fiber.Ctx) error {
 		return err
 	}
 
-	err = dao.AddEmployee(emp)
+	err = messaging.AddEmployee(emp)
 	if err != nil {
-		c.SendString("Could not add employee")
+		c.SendString("Could not add employee: " + err.Error())
 		return err
 	}
 
 	return nil
 }
 
-// app.Put("/employee", updEmployee())
 func updEmployee(c *fiber.Ctx) error {
+	emp := domain.Employee{}
+	err := c.BodyParser(emp)
+	if err != nil {
+		c.Context().SetStatusCode(400)
+		c.SendString("Could not update employee: " + err.Error())
+		return err
+	}
 
+	err = messaging.UpdEmployee(emp)
+	if err != nil {
+		c.Context().SetStatusCode(400)
+		c.SendString("Could not update employee: " + err.Error())
+		return err
+	}
+
+	c.Context().SetStatusCode(200)
 	return nil
 }
 
 // app.Get("/employee/:employeeID", findEmployee())
 func findEmployee(c *fiber.Ctx) error {
+	var id int64
+	c.Locals("id", id)
+	emp, err := messaging.FindEmployee(id)
+	if err != nil {
+		c.Context().SetStatusCode(404)
+		c.SendString("User not found")
+		return err
+	}
+	
+	err = c.JSON(emp)	
+	if err != nil {
+		c.SendString("error marshalling")
+		return err
+	}
 
 	return nil
 }
