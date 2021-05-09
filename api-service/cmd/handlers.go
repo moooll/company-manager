@@ -1,25 +1,25 @@
 package cmd
 
 import (
-	"errors"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/moooll/company-manager/api-service/pkg/domain"
 	"github.com/moooll/company-manager/api-service/internal/messaging"
+	"github.com/moooll/company-manager/api-service/pkg/domain"
 )
 
 // Add a new employee to the company, sends employee object that needs to be added to the company
 // If something goes wrong 405 - invalid input
 func addEmployee(c *fiber.Ctx) error {
-	if !c.Is("application/json") {
-		c.SendStatus(400)
-		c.Context().SetContentType("application/json")
-		c.SendString("Content type is application/json only")
-		return errors.New("Wrong content type")
-	}
+	// if !c.Is("application/json") {
+	// 	c.SendStatus(400)
+	// 	c.Context().SetContentType("application/json")
+	// 	c.SendString("Content type is application/json only")
+	// 	return errors.New("Wrong content type")
+	// }
 	emp := domain.Employee{}
-	err := c.BodyParser(emp)
+	err := c.BodyParser(&emp)
 	if err != nil {
 		c.Context().SetContentType("application/json")
 		c.SendStatus(400)
@@ -36,9 +36,10 @@ func addEmployee(c *fiber.Ctx) error {
 	return nil
 }
 
+// updates employee with put method
 func updEmployee(c *fiber.Ctx) error {
 	emp := domain.Employee{}
-	err := c.BodyParser(emp)
+	err := c.BodyParser(&emp)
 	if err != nil {
 		c.Context().SetStatusCode(400)
 		c.SendString("Could not update employee: " + err.Error())
@@ -56,7 +57,7 @@ func updEmployee(c *fiber.Ctx) error {
 	return nil
 }
 
-// app.Get("/employee/:employeeID", findEmployee())
+// finds employee by id
 func findEmployee(c *fiber.Ctx) error {
 	var id int64
 	c.Locals("id", id)
@@ -66,8 +67,8 @@ func findEmployee(c *fiber.Ctx) error {
 		c.SendString("User not found")
 		return err
 	}
-	
-	err = c.JSON(emp)	
+
+	err = c.JSON(emp)
 	if err != nil {
 		c.SendString("error marshalling")
 		return err
@@ -76,15 +77,41 @@ func findEmployee(c *fiber.Ctx) error {
 	return nil
 }
 
-// app.Post("/employee/:employeeID", updEmployeeFormData())
+// update employee info read from multipart form
 func updEmployeeFormData(c *fiber.Ctx) error {
+	var id int64
+	c.Locals("id", id)
+	cID, err := strconv.ParseInt(c.FormValue("companyId"), 10, 64)
+	if err != nil {
+		return err
+	}
+
+	emp := domain.Employee{
+		ID: id,
+		Name: c.FormValue("name"),
+		SecondName: c.FormValue("secondName"),
+		Surname: c.FormValue("surname"),
+		HireDate: c.FormValue("hireDate"),
+		Position: c.FormValue("position"),
+		CompanyID: cID,
+	}
+
+	err = messaging.UpdEmployeeFormData(emp)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-// app.Delete("/employee/:employeeID", delEmplaoyee())
-func delEmplaoyee(c *fiber.Ctx) error {
-
+// app.Delete("/employee/:employeeID", delEmployee())
+func delEmployee(c *fiber.Ctx) error {
+	var id int64
+	c.Locals("id", id)
+	err := messaging.DelEmployee(id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
