@@ -5,10 +5,9 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"go.uber.org/zap"
 
-	"github.com/moooll/company-manager/api-service/internal/messaging"
-	"github.com/moooll/company-manager/api-service/pkg/domain"
+	"api-service/internal/messaging"
+	"api-service/pkg/domain"
 )
 
 // Add a new employee to the company, sends employee object that needs to be added to the company
@@ -121,7 +120,7 @@ func delEmployee(c *fiber.Ctx) error {
 	return nil
 }
 
-// adds new company 
+// adds new company
 func addCompany(c *fiber.Ctx) error {
 	comp := domain.Company{}
 	err := c.BodyParser(&comp)
@@ -145,7 +144,6 @@ func updCompany(c *fiber.Ctx) error {
 	comp := domain.Company{}
 	err := c.BodyParser(&comp)
 	if err != nil {
-		zap.L().Error(err.Error())
 		c.Status(400).SendString(err.Error())
 		return err
 	}
@@ -190,8 +188,8 @@ func updCompanyFormData(c *fiber.Ctx) error {
 	}
 
 	comp := domain.Company{
-		ID: id,
-		Name: c.FormValue("name"),
+		ID:        id,
+		Name:      c.FormValue("name"),
 		LegalForm: c.FormValue("status"),
 	}
 
@@ -207,8 +205,8 @@ func delCompany(c *fiber.Ctx) error {
 		c.Status(500)
 		return err
 	}
-	
-	err = messaging.DelCompany(id) 
+
+	err = messaging.DelCompany(id)
 	if err != nil {
 		c.Status(400)
 	}

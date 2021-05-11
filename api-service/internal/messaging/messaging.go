@@ -3,7 +3,7 @@ package messaging
 import (
 	"errors"
 
-	"github.com/moooll/company-manager/api-service/pkg/domain"
+	"api-service/pkg/domain"
 )
 
 // messaging package implements call to message broker for message transfer to repi-service

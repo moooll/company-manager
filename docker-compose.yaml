@@ -1,0 +1,79 @@
+version: "3.7"
+
+services:
+  app:
+    image: api-service
+    depends_on: 
+      - broker
+      - db
+    links:
+      - db
+      - broker
+    container_name: api
+    build:
+      context: ./api-service
+      dockerfile: docker/Dockerfile
+    ports:
+      - 7000:3000
+    networks:
+      - microservices
+    restart: on-failure
+
+  repo-service:
+    image: repo-service
+    depends_on: 
+      - broker
+      - db
+    links:
+      - db
+      - broker
+    container_name: repo
+    build:
+      context: ./repo-service
+      dockerfile: docker/Dockerfile
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_NAME: ${DB_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 7001:3000
+    networks:
+      - microservices
+    restart: on-failure
+
+  db:
+    image: repo-db
+    depends_on:
+      - broker
+    links:
+      - broker
+    container_name: repo-db
+    build:
+      context: ./repo-service/docker/db
+    environment:
+      POSTGRES_DB: not_postgres
+      POSTGRES_USER: nie_postres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_NAME: ${DB_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports: 
+      - 7002:5432
+    networks:
+      - microservices
+    restart: on-failure
+
+  broker:
+    container_name: rabbit
+    image: rabbitmq:3.8-alpine
+    ports: 
+      - 7003:5672
+    networks:
+      - microservices
+    restart: on-failure
+      
+networks:
+  microservices:
+    driver: bridge
