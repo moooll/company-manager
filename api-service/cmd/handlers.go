@@ -14,12 +14,6 @@ import (
 // Add a new employee to the company, sends employee object that needs to be added to the company
 // If something goes wrong 405 - invalid input
 func addEmployee(c *fiber.Ctx) error {
-	// if !c.Is("application/json") {
-	// 	c.SendStatus(400)
-	// 	c.Context().SetContentType("application/json")
-	// 	c.SendString("Content type is application/json only")
-	// 	return errors.New("Wrong content type")
-	// }
 	emp := domain.Employee{}
 	err := c.BodyParser(&emp)
 	if err != nil {
@@ -110,7 +104,7 @@ func updEmployeeFormData(c *fiber.Ctx) error {
 	return nil
 }
 
-// app.Delete("/employee/:employeeID", delEmployee())
+// deletes employee by the param in url
 func delEmployee(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
@@ -127,7 +121,7 @@ func delEmployee(c *fiber.Ctx) error {
 	return nil
 }
 
-// app.Post("/company", addCompany())
+// adds new company 
 func addCompany(c *fiber.Ctx) error {
 	comp := domain.Company{}
 	err := c.BodyParser(&comp)
@@ -146,7 +140,7 @@ func addCompany(c *fiber.Ctx) error {
 	return nil
 }
 
-// app.Put("/company", updCompany())
+// updates existing company
 func updCompany(c *fiber.Ctx) error {
 	comp := domain.Company{}
 	err := c.BodyParser(&comp)
@@ -165,7 +159,7 @@ func updCompany(c *fiber.Ctx) error {
 	return nil
 }
 
-// app.Get("/company/:companyID", findCompany())
+// finds company by the id in url
 func findCompany(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
@@ -187,7 +181,7 @@ func findCompany(c *fiber.Ctx) error {
 	return nil
 }
 
-// app.Post("/company/:companyID", updCompanyFormData())
+// updates company with form data
 func updCompanyFormData(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
@@ -206,7 +200,7 @@ func updCompanyFormData(c *fiber.Ctx) error {
 	return nil
 }
 
-// app.Delete("/company/:companyID", delCompany())
+// deletes the company by id
 func delCompany(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
@@ -222,7 +216,7 @@ func delCompany(c *fiber.Ctx) error {
 	return nil
 }
 
-// app.Get("/company/:companyID/employees", getEmployeeList())
+// gets the list of the employees of the company, which is specified by id in url
 func getEmployeeList(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
