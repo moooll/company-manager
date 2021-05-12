@@ -30,7 +30,7 @@ services:
     container_name: repo
     build:
       context: ./repo-service
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/service/Dockerfile
     environment:
       DB_HOST: ${DB_HOST}
       DB_USER: ${DB_USER}
@@ -44,10 +44,6 @@ services:
 
   db:
     image: repo-db
-    depends_on:
-      - broker
-    links:
-      - broker
     container_name: repo-db
     build:
       context: ./repo-service/docker/db
@@ -70,6 +66,7 @@ services:
     image: rabbitmq:3.8-alpine
     ports: 
       - 7003:5672
+      - 7004:25672
     networks:
       - microservices
     restart: on-failure
