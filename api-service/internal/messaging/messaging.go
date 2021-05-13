@@ -2,7 +2,7 @@ package messaging
 
 import (
 	"errors"
-
+	
 	"api-service/pkg/domain"
 
 	"github.com/moooll/company-manager/rabbit"

@@ -6,8 +6,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"api-service/internal/messaging"
-	"api-service/pkg/domain"
+	"github.com/moooll/company-manager/api-service/internal/messaging"
+	"github.com/moooll/company-manager/api-service/pkg/domain"
 )
 
 // Add a new employee to the company, sends employee object that needs to be added to the company
