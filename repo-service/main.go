@@ -7,8 +7,9 @@ import (
 
 	pg "github.com/go-pg/pg/v10"
 	"go.uber.org/zap"
+	"github.com/streadway/amqp"
 
-	"repo-service/constants"
+	"github.com/moooll/company-manager/repo-service/internal/constants"
 )
 
 func main() {
@@ -21,6 +22,28 @@ func main() {
 
 	defer logger.Sync()
 
+	conn, err := amqp.Dial(constants.MQURL)
+	if err != nil {
+		zap.Error(err)
+	}
+
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	if err != nil {
+		zap.Error(err)
+	}
+
+	defer ch.Close()
+	_, err = ch.QueueDeclare(
+		"from-db",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	zap.L().Info("to-db queue is declared")
 	pseudoDsn := fmt.Sprintf(
 		"%s:%s",
 		os.Getenv(constants.DatabaseHost),

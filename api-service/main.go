@@ -3,8 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/moooll/company-manager/api-service/cmd"
 	"go.uber.org/zap"
+	"github.com/streadway/amqp"
+
+	"api-service/cmd"
+	"api-service/internal/messaging"
+
 )
 
 func main() {
@@ -15,5 +19,30 @@ func main() {
 	}
 
 	defer logger.Sync()
+
+	conn, err := amqp.Dial(messaging.MQURL)
+	if err != nil {
+		zap.Error(err)
+		return
+	}
+
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	if err != nil {
+		zap.Error(err)
+		return
+	}
+
+	defer ch.Close()
+	_, err = ch.QueueDeclare(
+		"to-db",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	zap.L().Info("to-db queue is declared")
 	cmd.Serve()
 }

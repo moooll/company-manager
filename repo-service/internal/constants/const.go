@@ -6,4 +6,5 @@ const (
 	DatabaseUser     = "DB_USER"
 	DatabasePassword = "DB_PASSWORD"
 	DatabaseName     = "DB_NAME"
+	MQURL            = "MQURL"
 )

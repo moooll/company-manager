@@ -63,10 +63,10 @@ services:
 
   broker:
     container_name: rabbit
-    image: rabbitmq:3.8-alpine
+    image: rabbitmq:3-management
     ports: 
       - 7003:5672
-      - 7004:25672
+      - 7004:15672
     networks:
       - microservices
     restart: on-failure

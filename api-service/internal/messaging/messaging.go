@@ -4,34 +4,67 @@ import (
 	"errors"
 
 	"api-service/pkg/domain"
+
+	"github.com/moooll/company-manager/rabbit"
+	"go.uber.org/zap"
 )
 
 // messaging package implements call to message broker for message transfer to repi-service
 // it hides the call to specific message broker so that later it can be changed
 
 //
+// func ListenAndRoute(Function string, msg chan(rabbit.Msg), er chan(error)) {
+// 	err := rabbit.Receive("from-db", msg)
+// 	if err != nil {
+// 		er <- err
+// 		return
+// 	}
+
+// 	wait := make(chan bool)
+// 	<- wait
+// }
+
 func AddEmployee(emp domain.Employee) error {
+	body := rabbit.Msg{
+		Function: "AddEmployee",
+		Entity:   emp,
+	}
+	err := rabbit.Send(body, "to-db")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func UpdEmployee(emp domain.Employee) error {
+	body := rabbit.Msg{
+		Function: "UpdEmployee",
+		Entity:   emp,
+	}
+	err := rabbit.Send(body, "to-db")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func FindEmployee(id int64) (domain.Employee, error) {
-	if id != 0 {
-		return domain.Employee{}, errors.New("wrong key")
+	body := rabbit.Msg{
+		Function: "FindEmployee",
+		Entity:   id,
 	}
+	err := rabbit.Send(body, "to-db")
+	if err != nil {
+		return err
+	}
+	zap.L().Info("message is sent")
+	// go func() {
 
-	return domain.Employee{
-		ID:         0,
-		Name:       "Aaron",
-		SecondName: "Glen",
-		Surname:    "Smith",
-		HireDate:   "2020-09-01",
-		Position:   "developer",
-		CompanyID:  1,
-	}, nil
+	// }
+	// err := rabbit.
+	return domain.Employee{}, nil
 }
 
 func UpdEmployeeFormData(emp domain.Employee) error {
@@ -47,7 +80,6 @@ func DelEmployee(id int64) error {
 	return nil
 }
 
-
 func AddCompany(emp domain.Company) error {
 	return nil
 }
@@ -58,10 +90,10 @@ func UpdCompany(emp domain.Company) error {
 
 func FindCompany(id int64) (domain.Company, error) {
 	return domain.Company{
-		ID: 0,
-		Name: "Qulix Systems",
+		ID:        0,
+		Name:      "Qulix Systems",
 		LegalForm: "OOO",
-	  }, nil
+	}, nil
 }
 
 func DelCompany(id int64) error {
