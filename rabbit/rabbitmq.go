@@ -4,7 +4,7 @@ import (
 	"github.com/pquerna/ffjson/ffjson"
 	"github.com/streadway/amqp"
 
-	"github.com/moooll/company-manager/api-service/pkg/domain"
+	"github.com/moooll/company-manager/rabbit/domain"
 )
 
 const MQURL = "MQ_URL"
@@ -63,12 +63,12 @@ func Receive(queue string, k chan (Msg), ch amqp.Channel) (err error) {
 	// )
 	msgs, err := ch.Consume(
 		queue,
-		"",     // consumer
-		false,   // auto-ack false	
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
+		"",    // consumer
+		false, // auto-ack false
+		false, // exclusive
+		false, // no-local
+		false, // no-wait
+		nil,   // args
 	)
 
 	if err != nil {

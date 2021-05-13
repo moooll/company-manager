@@ -15,6 +15,7 @@ type dbInfo struct {
 	ctx *context.Context
 	db *pg.DB
 }
+
 func Listen(dbInfo *dbInfo, ch amqp.Channel, mes chan (rabbit.Msg), er chan (error)) {
 	err := rabbit.Receive("to-db", mes, ch)
 	if err != nil {
